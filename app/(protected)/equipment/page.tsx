@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/Input";
 import { LoadingState } from "@/components/ui/LoadingState";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { TextBadge } from "@/components/ui/Badge";
 import { Table, TBody, Td, THead, Th, Tr } from "@/components/ui/Table";
 import type { EquipmentRow } from "@/types/database";
@@ -128,18 +129,16 @@ export default function EquipmentPage() {
 
   return (
     <div className="grid gap-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Eszközök</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Ládavasutak, utánfutók, sínkészletek és rendezvényes eszközök.
-          </p>
-        </div>
-        <Link className={buttonClasses({})} href="/equipment/new">
-          <Plus size={18} />
-          Új eszköz
-        </Link>
-      </div>
+      <PageHeader
+        actions={
+          <Link className={buttonClasses({})} href="/equipment/new">
+            <Plus size={18} />
+            Új eszköz
+          </Link>
+        }
+        description="Ládavasutak, utánfutók és rendezvényes eszközök kezelése."
+        title="Eszközök"
+      />
 
       {error ? <ErrorMessage message={error} /> : null}
 
@@ -165,7 +164,7 @@ export default function EquipmentPage() {
               <Input
                 className="pl-10"
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Keresés név, típus vagy azonosító alapján"
+                placeholder="Keresés"
                 value={search}
               />
             </div>

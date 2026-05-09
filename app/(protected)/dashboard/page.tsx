@@ -10,14 +10,20 @@ import {
   Users,
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/calculations";
+import {
+  detectEmployeeConflicts,
+  detectEquipmentConflicts,
+} from "@/lib/conflicts";
 import { formatTime, getTodayIsoDate } from "@/lib/date";
 import { getJobStatusTone, jobStatusLabels, jobStatusOptions } from "@/lib/jobStatus";
 import { supabase } from "@/lib/supabaseClient";
+import { CrmAssistantPanel } from "@/components/ai/CrmAssistantPanel";
 import { buttonClasses } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { TextBadge } from "@/components/ui/Badge";
 import { Table, TBody, Td, THead, Th, Tr } from "@/components/ui/Table";
 import type {
@@ -25,6 +31,7 @@ import type {
   EmployeeRow,
   EquipmentRow,
   JobAssignmentRow,
+  JobEquipmentRow,
   JobRow,
 } from "@/types/database";
 import type { JobStatus } from "@/types/job";
@@ -48,6 +55,7 @@ export default function DashboardPage() {
   const [equipment, setEquipment] = useState<EquipmentRow[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [jobEquipment, setJobEquipment] = useState<JobEquipmentRow[]>([]);
   const [jobs, setJobs] = useState<JobRow[]>([]);
 
   useEffect(() => {
@@ -60,12 +68,14 @@ export default function DashboardPage() {
         equipmentResult,
         jobsResult,
         assignmentsResult,
+        jobEquipmentResult,
       ] = await Promise.all([
         supabase.from("clients").select("*"),
         supabase.from("employees").select("*"),
         supabase.from("equipment").select("*"),
         supabase.from("jobs").select("*").order("event_date", { ascending: true }),
         supabase.from("job_assignments").select("*"),
+        supabase.from("job_equipment").select("*"),
       ]);
 
       if (!isMounted) {
@@ -77,7 +87,8 @@ export default function DashboardPage() {
         employeesResult.error ??
         equipmentResult.error ??
         jobsResult.error ??
-        assignmentsResult.error;
+        assignmentsResult.error ??
+        jobEquipmentResult.error;
 
       if (firstError) {
         setError(firstError.message);
@@ -87,6 +98,7 @@ export default function DashboardPage() {
         setEquipment(equipmentResult.data ?? []);
         setJobs(jobsResult.data ?? []);
         setAssignments(assignmentsResult.data ?? []);
+        setJobEquipment(jobEquipmentResult.data ?? []);
       }
 
       setIsLoading(false);
@@ -137,23 +149,41 @@ export default function DashboardPage() {
     };
   }, [assignments, employees, equipment, jobs]);
 
+  const warningItems = useMemo(() => {
+    const upcoming = metrics.upcomingJobs;
+    const items = upcoming.flatMap((job) => [
+      ...detectEmployeeConflicts({
+        assignments,
+        currentJob: job,
+        employees,
+        jobs,
+      }),
+      ...detectEquipmentConflicts({
+        currentJob: job,
+        equipment,
+        jobEquipment,
+        jobs,
+      }),
+    ]);
+
+    return items.slice(0, 5);
+  }, [assignments, employees, equipment, jobEquipment, jobs, metrics.upcomingJobs]);
+
   if (isLoading) {
     return <LoadingState />;
   }
 
   return (
     <div className="grid gap-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Dashboard</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Céges áttekintő a közelgő rendezvényekről, dolgozókról és eszközökről.
-          </p>
-        </div>
-        <Link className={buttonClasses({})} href="/jobs/new">
-          Új munka
-        </Link>
-      </div>
+      <PageHeader
+        actions={
+          <Link className={buttonClasses({})} href="/jobs/new">
+            Új munka
+          </Link>
+        }
+        description="Céges áttekintő a közelgő rendezvényekről, dolgozókról és eszközökről."
+        title="Dashboard"
+      />
 
       {error ? <ErrorMessage message={error} /> : null}
 
@@ -199,6 +229,52 @@ export default function DashboardPage() {
           value={formatCurrency(metrics.paidRevenue)}
         />
       </div>
+
+      <Card>
+        <CardHeader>
+          <h2 className="text-base font-semibold text-slate-950">
+            Rendszer áttekintés
+          </h2>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {[
+              "Ügyfélkezelés",
+              "Munkaszervezés",
+              "Dolgozói beosztás",
+              "Eszközkezelés",
+              "Naptár",
+              "Ütközésfigyelés",
+              "Kitelepülési lap",
+              "Árajánlatok",
+              "AI asszisztens",
+            ].map((feature) => (
+              <div
+                className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700"
+                key={feature}
+              >
+                {feature}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <CrmAssistantPanel
+        context={{
+          activeEmployees: metrics.activeEmployees,
+          activeEquipment: metrics.activeEquipment,
+          todayJobs: metrics.todayJobs,
+          upcomingJobs: metrics.upcomingJobs.map((job) => ({
+            date: job.event_date,
+            status: job.status,
+            title: job.title,
+          })),
+          warnings: warningItems.map((warning) => warning.message),
+        }}
+        missingItems={warningItems.length > 0 ? ["ellenőrizendő ütközések"] : []}
+        mode="dashboard"
+      />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
         <Card>
@@ -266,26 +342,53 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <h2 className="text-base font-semibold text-slate-950">
-              Munka státuszok
-            </h2>
-          </CardHeader>
-          <CardContent className="grid gap-3">
-            {jobStatusOptions.map((status) => (
-              <div
-                className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2"
-                key={status.value}
-              >
-                <span className="text-sm text-slate-600">{status.label}</span>
-                <strong className="text-sm text-slate-950">
-                  {metrics.statusCounts[status.value]}
-                </strong>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <div className="grid content-start gap-6">
+          <Card>
+            <CardHeader>
+              <h2 className="text-base font-semibold text-slate-950">
+                Figyelmeztetések
+              </h2>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              {warningItems.length === 0 ? (
+                <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+                  Nincs ismert dolgozói vagy eszközütközés a közelgő munkákban.
+                </p>
+              ) : (
+                warningItems.map((warning) => (
+                  <Link
+                    className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 transition hover:bg-amber-100"
+                    href={`/jobs/${warning.conflictingJob.id}`}
+                    key={`${warning.name}-${warning.conflictingJob.id}-${warning.message}`}
+                  >
+                    <strong>{warning.name}</strong>: {warning.message}
+                  </Link>
+                ))
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <h2 className="text-base font-semibold text-slate-950">
+                Munka státuszok
+              </h2>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              {jobStatusOptions.map((status) => (
+                <div
+                  className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2"
+                  key={status.value}
+                >
+                  <span className="text-sm text-slate-600">{status.label}</span>
+                  <strong className="text-sm text-slate-950">
+                    {metrics.statusCounts[status.value]}
+                  </strong>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

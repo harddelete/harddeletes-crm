@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { signInWithEmail, signUpWithEmail } from "@/lib/auth";
 import { useAuth } from "./AuthProvider";
-import { BrandLogo } from "@/components/layout/BrandLogo";
+import { Logo } from "@/components/layout/Logo";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -79,7 +79,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
-          <BrandLogo className="justify-center" priority size="auth" />
+          <Logo className="justify-center" size="large" />
           <h1 className="mt-2 text-2xl font-semibold text-slate-950">
             {isLogin ? "Bejelentkezés" : "Regisztráció"}
           </h1>
@@ -107,15 +107,14 @@ export function AuthForm({ mode }: AuthFormProps) {
                 autoComplete="email"
                 label="Email"
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="nev@ceg.hu"
                 type="email"
                 value={email}
               />
               <Input
                 autoComplete={isLogin ? "current-password" : "new-password"}
+                helperText={isLogin ? undefined : "Minimum 6 karakter."}
                 label="Jelszó"
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="Legalább 6 karakter"
                 type="password"
                 value={password}
               />

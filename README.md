@@ -1,22 +1,26 @@
 # Harddelete's CRM
 
-Harddelete's CRM egy magyar nyelvű céges CRM és munkaszervező MVP egy ládavasút élmény jellegű rendezvényes vállalkozásnak. A rendszer célja, hogy egy helyen kezelhetőek legyenek az ügyfelek, ajánlatok, konkrét kitelepülések, dolgozói beosztások és a ládavasutakhoz vagy rendezvényekhez használt eszközök.
+Harddelete's CRM egy magyar nyelvű, egyedi CRM és munkaszervező webalkalmazás rendezvényes ládavasút jellegű vállalkozáshoz. A rendszer célja, hogy egy helyen kezelhetőek legyenek az ügyfelek, árajánlatok, kitelepülések, dolgozói beosztások, eszközök, ütemezések és bemutatóképes üzleti áttekintések.
 
 ## Mire való?
 
-Az app olyan vállalkozáshoz készült, amely különböző rendezvényekre visz ki ládavasútakat és kapcsolódó eszközöket, például falunapra, majálisra, céges rendezvényre, családi napra, városi programra, iskolai rendezvényre, fesztiválra vagy magánrendezvényre.
+Az app olyan céghez készült, amely különböző rendezvényekre visz ki ládavasutakat és kapcsolódó eszközöket: falunapokra, majálisokra, céges rendezvényekre, családi napokra, városi programokra, iskolai rendezvényekre, fesztiválokra vagy magánrendezvényekre.
 
 ## Fő modulok
 
 - Supabase Auth email + jelszavas regisztrációval és belépéssel
-- Dashboard közelgő munkákkal, státusz összesítővel és céges metrikákkal
-- Ügyfelek kezelése
-- Árajánlatok kezelése, tételszámítással és PDF exporttal
-- Dolgozók kezelése aktív/inaktív státusszal, munkakörrel és pozícióval
-- Eszközök / ládavasutak kezelése státusszal és kapacitással
+- Dashboard céges metrikákkal, közelgő munkákkal és bemutató áttekintéssel
+- Ügyfélkezelés
+- Árajánlat-kezelés, tételszámítással és PDF exporttal
 - Munkák / rendezvények kezelése dátummal, helyszínnel, státusszal és vállalási árral
-- Dolgozók hozzárendelése munkákhoz szereppel és tervezett idővel
-- Eszközök hozzárendelése munkákhoz mennyiséggel és megjegyzéssel
+- Dolgozók kezelése aktív/inaktív státusszal, munkakörrel és pozícióval
+- Dolgozói beosztások munkákhoz szereppel és tervezett idővel
+- Eszközök / ládavasutak kezelése státusszal és kapacitással
+- Eszközhozzárendelés munkákhoz mennyiséggel és megjegyzéssel
+- Naptár / ütemezés nézet időrendi munkalistával
+- Ütközésfigyelés dolgozókra és eszközökre
+- Nyomtatható kitelepülési lap minden munkához
+- Opcionális AI CRM asszisztens munkaszervezési összefoglalóhoz és checklistához
 
 ## Használt technológiák
 
@@ -24,8 +28,9 @@ Az app olyan vállalkozáshoz készült, amely különböző rendezvényekre vis
 - TypeScript
 - Tailwind CSS
 - Supabase adatbázis és Auth
-- jsPDF PDF exporthoz
+- jsPDF árajánlat PDF exporthoz
 - lucide-react ikonokhoz
+- OpenAI Responses API opcionális szerveroldali AI funkcióhoz
 
 ## Telepítés
 
@@ -52,15 +57,18 @@ Töltsd ki:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+OPENAI_API_KEY=
 ```
 
-Az értékeket a Supabase projekt `Project Settings > API` oldalán találod. Service role kulcsot ne tegyél a frontend kódba.
+A Supabase értékeket a Supabase projekt `Project Settings > API` oldalán találod. Service role kulcsot ne tegyél a frontend kódba.
+
+Az `OPENAI_API_KEY` opcionális. Ha nincs beállítva, az AI asszisztens panel nem omlik össze, hanem jelzi: `Az AI funkció nincs konfigurálva.`
 
 ## Supabase beállítás
 
 1. Hozz létre egy Supabase projektet.
 2. Engedélyezd az email + password authot.
-3. Futtasd le az alap sémát:
+3. Futtasd le az alap sémát a Supabase SQL Editorban:
 
 ```text
 supabase/schema.sql
@@ -72,7 +80,7 @@ supabase/schema.sql
 supabase/migrations/add_crm_modules.sql
 ```
 
-Az új migráció ezeket a táblákat hozza létre:
+Ez a migráció hozza létre az alábbi táblákat:
 
 - `employees`
 - `jobs`
@@ -114,12 +122,17 @@ npm.cmd run lint
 npm.cmd run build
 ```
 
-## Új oldalak
+## Fontos oldalak
 
+- `/login`
+- `/register`
+- `/dashboard`
+- `/calendar`
 - `/jobs`
 - `/jobs/new`
 - `/jobs/[id]`
 - `/jobs/[id]/edit`
+- `/jobs/[id]/sheet`
 - `/employees`
 - `/employees/new`
 - `/employees/[id]`
@@ -128,23 +141,45 @@ npm.cmd run build
 - `/equipment/new`
 - `/equipment/[id]`
 - `/equipment/[id]/edit`
+- `/clients`
+- `/quotes`
+- `/settings`
 
-A meglévő `/clients`, `/quotes` és `/settings` oldalak továbbra is megmaradtak.
+## AI CRM asszisztens
+
+Az AI funkció szerveroldali route-on keresztül működik:
+
+```text
+app/api/ai/crm-assistant/route.ts
+```
+
+A frontend nem kap API kulcsot. A dashboardon és a munka részleteinél elérhető panel rövid, magyar nyelvű munkaszervezési összefoglalót és praktikus checklistát tud generálni. Az asszisztens nem ment adatot automatikusan az adatbázisba.
+
+## Vercel deploy röviden
+
+1. Töltsd fel a projektet GitHubra.
+2. Hozz létre új Vercel projektet a repóból.
+3. Add meg az Environment Variables értékeket:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `OPENAI_API_KEY` opcionálisan
+4. Futtasd a Supabase SQL fájlokat a Supabase SQL Editorban.
+5. Deploy után teszteld a belépést, dashboardot, munkákat, naptárat és egy kitelepülési lap nyomtatási nézetét.
 
 ## Ismert korlátok
 
-- Nincs AI ajánlatsegéd vagy OpenAI integráció.
-- Nincs naptár szinkron, email küldés vagy automatikus számlázás.
-- A PDF export továbbra is egyszerű böngészős ajánlat PDF.
-- Az eszközfoglalás jelenleg nem figyel automatikus ütközéseket ugyanarra a dátumra.
-- A dolgozói munkaidőből még nincs automatikus bérköltség számítás.
+- Az AI asszisztens csak akkor ad generált választ, ha az `OPENAI_API_KEY` be van állítva.
+- A kitelepülési lap jelenleg böngészőből nyomtatható, nem külön PDF export.
+- Az ütközésfigyelés figyelmeztet, de nem blokkolja a mentést.
+- Nincs automatikus email küldés vagy naptárszinkron.
+- Nincs szerepkör alapú jogosultság több belső felhasználóhoz.
 
 ## Következő fejlesztési ötletek
 
-- Naptár nézet munkákhoz
-- Eszköz ütközésfigyelés
-- Dolgozói munkaidő és költség riport
 - Ajánlatból munka létrehozása egy kattintással
-- Logózott PDF sablonok
-- Emailes ajánlatküldés és rendezvény emlékeztetők
-- Jogosultsági szintek több belső felhasználónak
+- Google Calendar vagy Outlook Calendar szinkron
+- Emailes rendezvényemlékeztetők
+- Dolgozói munkaidő és bérköltség riport
+- Eszközkarbantartási napló
+- PDF kitelepülési lap céges sablonnal
+- Több felhasználós jogosultsági rendszer

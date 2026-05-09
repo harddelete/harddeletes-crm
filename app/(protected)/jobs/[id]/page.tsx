@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import {
   AssignmentWithEmployee,
@@ -12,6 +12,7 @@ import {
   JobEquipmentManager,
   JobEquipmentWithItem,
 } from "@/components/jobs/JobEquipmentManager";
+import { CrmAssistantPanel } from "@/components/ai/CrmAssistantPanel";
 import { buttonClasses, Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -21,6 +22,10 @@ import { LoadingState } from "@/components/ui/LoadingState";
 import { Select } from "@/components/ui/Select";
 import { TextBadge } from "@/components/ui/Badge";
 import { formatCurrency, formatDate } from "@/lib/calculations";
+import {
+  detectEmployeeConflicts,
+  detectEquipmentConflicts,
+} from "@/lib/conflicts";
 import { formatTime } from "@/lib/date";
 import { getJobStatusTone, jobStatusLabels, jobStatusOptions } from "@/lib/jobStatus";
 import { supabase } from "@/lib/supabaseClient";
@@ -38,6 +43,9 @@ import type { JobStatus } from "@/types/job";
 export default function JobDetailsPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const [allAssignments, setAllAssignments] = useState<JobAssignmentRow[]>([]);
+  const [allJobEquipment, setAllJobEquipment] = useState<JobEquipmentRow[]>([]);
+  const [allJobs, setAllJobs] = useState<JobRow[]>([]);
   const [assignments, setAssignments] = useState<AssignmentWithEmployee[]>([]);
   const [client, setClient] = useState<ClientRow | null>(null);
   const [employees, setEmployees] = useState<EmployeeRow[]>([]);
@@ -51,20 +59,19 @@ export default function JobDetailsPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const loadRelations = useCallback(async () => {
-    const [assignmentsResult, employeesResult, jobEquipmentResult, equipmentResult] =
+    const [
+      assignmentsResult,
+      employeesResult,
+      jobEquipmentResult,
+      equipmentResult,
+      jobsResult,
+    ] =
       await Promise.all([
-        supabase
-          .from("job_assignments")
-          .select("*")
-          .eq("job_id", params.id)
-          .order("created_at", { ascending: true }),
+        supabase.from("job_assignments").select("*"),
         supabase.from("employees").select("*").order("name", { ascending: true }),
-        supabase
-          .from("job_equipment")
-          .select("*")
-          .eq("job_id", params.id)
-          .order("created_at", { ascending: true }),
+        supabase.from("job_equipment").select("*"),
         supabase.from("equipment").select("*").order("name", { ascending: true }),
+        supabase.from("jobs").select("*"),
       ]);
 
     if (assignmentsResult.error) {
@@ -87,24 +94,38 @@ export default function JobDetailsPage() {
       return;
     }
 
+    if (jobsResult.error) {
+      setError(jobsResult.error.message);
+      return;
+    }
+
+    const assignmentRows = (assignmentsResult.data ?? []) as JobAssignmentRow[];
+    const jobEquipmentRows = (jobEquipmentResult.data ?? []) as JobEquipmentRow[];
     const employeeRows = employeesResult.data ?? [];
     const equipmentRows = equipmentResult.data ?? [];
     const employeeMap = new Map(employeeRows.map((employee) => [employee.id, employee]));
     const equipmentMap = new Map(equipmentRows.map((item) => [item.id, item]));
 
+    setAllAssignments(assignmentRows);
+    setAllJobEquipment(jobEquipmentRows);
+    setAllJobs(jobsResult.data ?? []);
     setEmployees(employeeRows);
     setEquipment(equipmentRows);
     setAssignments(
-      ((assignmentsResult.data ?? []) as JobAssignmentRow[]).map((assignment) => ({
-        ...assignment,
-        employee: employeeMap.get(assignment.employee_id) ?? null,
-      })),
+      assignmentRows
+        .filter((assignment) => assignment.job_id === params.id)
+        .map((assignment) => ({
+          ...assignment,
+          employee: employeeMap.get(assignment.employee_id) ?? null,
+        })),
     );
     setJobEquipment(
-      ((jobEquipmentResult.data ?? []) as JobEquipmentRow[]).map((assignment) => ({
-        ...assignment,
-        equipment: equipmentMap.get(assignment.equipment_id) ?? null,
-      })),
+      jobEquipmentRows
+        .filter((assignment) => assignment.job_id === params.id)
+        .map((assignment) => ({
+          ...assignment,
+          equipment: equipmentMap.get(assignment.equipment_id) ?? null,
+        })),
     );
   }, [params.id]);
 
@@ -184,6 +205,41 @@ export default function JobDetailsPage() {
     };
   }, [loadRelations, params.id]);
 
+  const conflicts = useMemo(() => {
+    if (!job) {
+      return { employee: [], equipment: [] };
+    }
+
+    return {
+      employee: detectEmployeeConflicts({
+        assignments: allAssignments,
+        currentJob: job,
+        employees,
+        jobs: allJobs,
+      }),
+      equipment: detectEquipmentConflicts({
+        currentJob: job,
+        equipment,
+        jobEquipment: allJobEquipment,
+        jobs: allJobs,
+      }),
+    };
+  }, [allAssignments, allJobEquipment, allJobs, employees, equipment, job]);
+
+  const missingItems = useMemo(() => {
+    if (!job) {
+      return [];
+    }
+
+    return [
+      !job.contact_phone ? "kapcsolattartó telefonszám" : null,
+      !job.start_time ? "kezdési idő" : null,
+      jobEquipment.length === 0 ? "hozzárendelt eszköz" : null,
+      assignments.length === 0 ? "beosztott dolgozó" : null,
+      !job.address ? "pontos cím" : null,
+    ].filter((item): item is string => Boolean(item));
+  }, [assignments.length, job, jobEquipment.length]);
+
   async function handleStatusChange(status: JobStatus) {
     if (!job) {
       return;
@@ -256,6 +312,12 @@ export default function JobDetailsPage() {
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Link
+            className={buttonClasses({ variant: "secondary" })}
+            href={`/jobs/${job.id}/sheet`}
+          >
+            Kitelepülési lap
+          </Link>
+          <Link
             className={buttonClasses({ variant: "outline" })}
             href={`/jobs/${job.id}/edit`}
           >
@@ -270,6 +332,31 @@ export default function JobDetailsPage() {
       </div>
 
       {error ? <ErrorMessage message={error} /> : null}
+
+      {conflicts.employee.length || conflicts.equipment.length ? (
+        <Card className="border-amber-200 bg-amber-50/70 shadow-amber-100/60">
+          <CardContent className="grid gap-3">
+            <h2 className="text-base font-semibold text-amber-950">
+              Figyelmeztetések
+            </h2>
+            {[...conflicts.employee, ...conflicts.equipment].map((conflict) => (
+              <div
+                className="rounded-xl border border-amber-200 bg-white/70 px-3 py-2 text-sm text-amber-900"
+                key={`${conflict.name}-${conflict.conflictingJob.id}-${conflict.message}`}
+              >
+                <strong>{conflict.name}</strong>: {conflict.message} Kapcsolódó
+                munka:{" "}
+                <Link
+                  className="font-semibold underline"
+                  href={`/jobs/${conflict.conflictingJob.id}`}
+                >
+                  {conflict.conflictingJob.title}
+                </Link>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
         <div className="grid gap-6">
@@ -337,6 +424,23 @@ export default function JobDetailsPage() {
             jobEquipment={jobEquipment}
             jobId={job.id}
             onChanged={loadRelations}
+          />
+
+          <CrmAssistantPanel
+            context={{
+              assignments: assignments.map((assignment) => ({
+                employee: assignment.employee?.name,
+                role: assignment.assignment_role,
+              })),
+              equipment: jobEquipment.map((assignment) => ({
+                equipment: assignment.equipment?.name,
+                quantity: assignment.quantity,
+              })),
+              job,
+            }}
+            missingItems={missingItems}
+            mode="job"
+            title="AI összefoglaló"
           />
         </div>
 

@@ -190,7 +190,7 @@ export default function QuotesPage() {
                 <Input
                   className="pl-10"
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Keresés cím vagy ajánlatszám szerint"
+                  placeholder="Keresés"
                   value={search}
                 />
               </div>

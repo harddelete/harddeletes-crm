@@ -133,7 +133,7 @@ export default function ClientsPage() {
               <Input
                 className="pl-10"
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Keresés név, email vagy cégnév alapján"
+                placeholder="Keresés"
                 value={search}
               />
             </div>

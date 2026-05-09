@@ -150,7 +150,6 @@ export function JobAssignmentsManager({
             onChange={(event) =>
               updateField("assignment_role", event.target.value)
             }
-            placeholder="Sofőr"
             value={values.assignment_role}
           />
           <Input

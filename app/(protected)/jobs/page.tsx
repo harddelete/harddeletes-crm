@@ -14,6 +14,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/Input";
 import { LoadingState } from "@/components/ui/LoadingState";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Select } from "@/components/ui/Select";
 import { Table, TBody, Td, THead, Th, Tr } from "@/components/ui/Table";
 import type { ClientRow, JobAssignmentRow, JobRow } from "@/types/database";
@@ -164,18 +165,16 @@ export default function JobsPage() {
 
   return (
     <div className="grid gap-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Munkák</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Kitelepülések, rendezvények, dolgozói beosztások és eszközök.
-          </p>
-        </div>
-        <Link className={buttonClasses({})} href="/jobs/new">
-          <Plus size={18} />
-          Új munka
-        </Link>
-      </div>
+      <PageHeader
+        actions={
+          <Link className={buttonClasses({})} href="/jobs/new">
+            <Plus size={18} />
+            Új munka
+          </Link>
+        }
+        description="Rendezvények, kitelepülések és beosztások kezelése."
+        title="Munkák"
+      />
 
       {error ? <ErrorMessage message={error} /> : null}
 
@@ -202,7 +201,7 @@ export default function JobsPage() {
                 <Input
                   className="pl-10"
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Keresés név, helyszín vagy ügyfél alapján"
+                  placeholder="Keresés"
                   value={search}
                 />
               </div>

@@ -79,39 +79,33 @@ export function ClientForm({
             <Input
               label="Ügyfél neve"
               onChange={(event) => updateField("name", event.target.value)}
-              placeholder="Kovács Péter"
               required
               value={values.name}
             />
             <Input
               label="Cégnév"
               onChange={(event) => updateField("company_name", event.target.value)}
-              placeholder="Kovács Klíma Kft."
               value={values.company_name}
             />
             <Input
               label="Email"
               onChange={(event) => updateField("email", event.target.value)}
-              placeholder="ugyfel@email.hu"
               type="email"
               value={values.email}
             />
             <Input
               label="Telefon"
               onChange={(event) => updateField("phone", event.target.value)}
-              placeholder="+36 30 123 4567"
               value={values.phone}
             />
             <Input
               label="Adószám"
               onChange={(event) => updateField("tax_number", event.target.value)}
-              placeholder="12345678-1-42"
               value={values.tax_number}
             />
             <Input
               label="Cím"
               onChange={(event) => updateField("address", event.target.value)}
-              placeholder="1111 Budapest, Példa utca 1."
               value={values.address}
             />
           </div>
@@ -119,7 +113,6 @@ export function ClientForm({
           <Textarea
             label="Megjegyzés"
             onChange={(event) => updateField("notes", event.target.value)}
-            placeholder="Belső megjegyzés az ügyfélhez"
             value={values.notes}
           />
 

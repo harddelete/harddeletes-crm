@@ -84,20 +84,17 @@ export function EquipmentForm({
             <Input
               label="Név"
               onChange={(event) => updateField("name", event.target.value)}
-              placeholder="Nagy ládavasút"
               required
               value={values.name}
             />
             <Input
               label="Típus"
               onChange={(event) => updateField("type", event.target.value)}
-              placeholder="Ládavasút, utánfutó, akkumulátor"
               value={values.type}
             />
             <Input
               label="Azonosító"
               onChange={(event) => updateField("identifier", event.target.value)}
-              placeholder="LDV-001"
               value={values.identifier}
             />
             <Input

@@ -83,38 +83,32 @@ export function SettingsForm({
             <Input
               label="Cégnév"
               onChange={(event) => updateField("company_name", event.target.value)}
-              placeholder="Mini Műhely Kft."
               value={values.company_name}
             />
             <Input
               label="Tulajdonos / kapcsolattartó"
               onChange={(event) => updateField("owner_name", event.target.value)}
-              placeholder="Nagy Anna"
               value={values.owner_name}
             />
             <Input
               label="Email"
               onChange={(event) => updateField("email", event.target.value)}
-              placeholder="info@ceg.hu"
               type="email"
               value={values.email}
             />
             <Input
               label="Telefon"
               onChange={(event) => updateField("phone", event.target.value)}
-              placeholder="+36 20 123 4567"
               value={values.phone}
             />
             <Input
               label="Adószám"
               onChange={(event) => updateField("tax_number", event.target.value)}
-              placeholder="12345678-2-42"
               value={values.tax_number}
             />
             <Input
               label="Bankszámlaszám"
               onChange={(event) => updateField("bank_account", event.target.value)}
-              placeholder="11700000-00000000"
               value={values.bank_account}
             />
             <Input
@@ -129,7 +123,6 @@ export function SettingsForm({
             <Input
               label="Cím"
               onChange={(event) => updateField("address", event.target.value)}
-              placeholder="1111 Budapest, Példa utca 1."
               value={values.address}
             />
           </div>

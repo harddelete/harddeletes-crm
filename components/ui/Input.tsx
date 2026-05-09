@@ -3,10 +3,18 @@ import { cn } from "@/lib/utils";
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
+  helperText?: string;
   label?: string;
 };
 
-export function Input({ className, error, id, label, ...props }: InputProps) {
+export function Input({
+  className,
+  error,
+  helperText,
+  id,
+  label,
+  ...props
+}: InputProps) {
   return (
     <label className="grid gap-1.5 text-sm font-medium text-slate-700">
       {label ? <span>{label}</span> : null}
@@ -19,6 +27,9 @@ export function Input({ className, error, id, label, ...props }: InputProps) {
         id={id}
         {...props}
       />
+      {helperText && !error ? (
+        <span className="text-xs font-normal text-slate-500">{helperText}</span>
+      ) : null}
       {error ? <span className="text-xs text-rose-600">{error}</span> : null}
     </label>
   );

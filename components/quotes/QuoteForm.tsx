@@ -199,7 +199,6 @@ export function QuoteForm({
             <Input
               label="Cím"
               onChange={(event) => updateField("title", event.target.value)}
-              placeholder="Klíma telepítés"
               required
               value={values.title}
             />
@@ -223,7 +222,6 @@ export function QuoteForm({
             <Textarea
               label="Leírás"
               onChange={(event) => updateField("description", event.target.value)}
-              placeholder="Röviden írd le az ajánlat tartalmát."
               value={values.description}
             />
           </div>
@@ -247,7 +245,6 @@ export function QuoteForm({
               <Input
                 label="Megnevezés"
                 onChange={(event) => updateItem(index, "name", event.target.value)}
-                placeholder="Munkaóra"
                 value={item.name}
               />
               <Input
@@ -255,7 +252,6 @@ export function QuoteForm({
                 onChange={(event) =>
                   updateItem(index, "description", event.target.value)
                 }
-                placeholder="Szerelési munka"
                 value={item.description}
               />
               <Input

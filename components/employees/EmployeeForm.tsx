@@ -91,33 +91,28 @@ export function EmployeeForm({
             <Input
               label="Név"
               onChange={(event) => updateField("name", event.target.value)}
-              placeholder="Nagy Péter"
               required
               value={values.name}
             />
             <Input
               label="Email"
               onChange={(event) => updateField("email", event.target.value)}
-              placeholder="nev@email.hu"
               type="email"
               value={values.email}
             />
             <Input
               label="Telefonszám"
               onChange={(event) => updateField("phone", event.target.value)}
-              placeholder="+36 30 123 4567"
               value={values.phone}
             />
             <Input
               label="Munkakör"
               onChange={(event) => updateField("job_title", event.target.value)}
-              placeholder="Sofőr, animátor, karbantartó"
               value={values.job_title}
             />
             <Input
               label="Pozíció / szerepkör"
               onChange={(event) => updateField("position", event.target.value)}
-              placeholder="Helyszíni felelős"
               value={values.position}
             />
             <Select

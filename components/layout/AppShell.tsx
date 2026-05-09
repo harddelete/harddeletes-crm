@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BriefcaseBusiness,
+  CalendarDays,
   FileText,
   LayoutDashboard,
   LogOut,
@@ -14,10 +15,11 @@ import {
 import { signOut } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import { BrandLogo } from "./BrandLogo";
+import { Logo } from "./Logo";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/calendar", icon: CalendarDays, label: "Naptár" },
   { href: "/jobs", icon: BriefcaseBusiness, label: "Munkák" },
   { href: "/employees", icon: Users, label: "Dolgozók" },
   { href: "/equipment", icon: Package, label: "Eszközök" },
@@ -43,7 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-slate-50">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-slate-200 bg-white px-4 py-5 lg:flex lg:flex-col">
         <Link className="flex items-center px-2" href="/dashboard">
-          <BrandLogo priority size="desktop" />
+          <Logo />
         </Link>
 
         <nav className="mt-8 grid gap-1">
@@ -82,7 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
           <div className="flex items-center justify-between gap-3">
             <Link className="flex items-center" href="/dashboard">
-              <BrandLogo priority size="mobile" />
+              <Logo size="compact" />
             </Link>
             <Button onClick={handleSignOut} size="sm" variant="ghost">
               <LogOut size={18} />

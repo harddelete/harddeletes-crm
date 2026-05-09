@@ -125,14 +125,12 @@ export function JobForm({
             <Input
               label="Munka / rendezvény neve"
               onChange={(event) => updateField("title", event.target.value)}
-              placeholder="Falunap - Nagy ládavasút"
               required
               value={values.title}
             />
             <Input
               label="Rendezvény típusa"
               onChange={(event) => updateField("event_type", event.target.value)}
-              placeholder="falunap, majális, céges rendezvény"
               value={values.event_type}
             />
             <Select
@@ -162,19 +160,16 @@ export function JobForm({
             <Input
               label="Helyszín neve"
               onChange={(event) => updateField("location_name", event.target.value)}
-              placeholder="Főtér"
               value={values.location_name}
             />
             <Input
               label="Település"
               onChange={(event) => updateField("city", event.target.value)}
-              placeholder="Budapest"
               value={values.city}
             />
             <Input
               label="Cím"
               onChange={(event) => updateField("address", event.target.value)}
-              placeholder="Fő utca 1."
               value={values.address}
             />
             <Select
