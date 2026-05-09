@@ -20,7 +20,6 @@ Az app olyan céghez készült, amely különböző rendezvényekre visz ki lád
 - Naptár / ütemezés nézet időrendi munkalistával
 - Ütközésfigyelés dolgozókra és eszközökre
 - Nyomtatható kitelepülési lap minden munkához
-- Opcionális AI CRM asszisztens munkaszervezési összefoglalóhoz és checklistához
 
 ## Használt technológiák
 
@@ -30,7 +29,6 @@ Az app olyan céghez készült, amely különböző rendezvényekre visz ki lád
 - Supabase adatbázis és Auth
 - jsPDF árajánlat PDF exporthoz
 - lucide-react ikonokhoz
-- OpenAI Responses API opcionális szerveroldali AI funkcióhoz
 
 ## Telepítés
 
@@ -57,12 +55,9 @@ Töltsd ki:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-OPENAI_API_KEY=
 ```
 
 A Supabase értékeket a Supabase projekt `Project Settings > API` oldalán találod. Service role kulcsot ne tegyél a frontend kódba.
-
-Az `OPENAI_API_KEY` opcionális. Ha nincs beállítva, az AI asszisztens panel nem omlik össze, hanem jelzi: `Az AI funkció nincs konfigurálva.`
 
 ## Supabase beállítás
 
@@ -145,16 +140,6 @@ npm.cmd run build
 - `/quotes`
 - `/settings`
 
-## AI CRM asszisztens
-
-Az AI funkció szerveroldali route-on keresztül működik:
-
-```text
-app/api/ai/crm-assistant/route.ts
-```
-
-A frontend nem kap API kulcsot. A dashboardon és a munka részleteinél elérhető panel rövid, magyar nyelvű munkaszervezési összefoglalót és praktikus checklistát tud generálni. Az asszisztens nem ment adatot automatikusan az adatbázisba.
-
 ## Vercel deploy röviden
 
 1. Töltsd fel a projektet GitHubra.
@@ -162,13 +147,11 @@ A frontend nem kap API kulcsot. A dashboardon és a munka részleteinél elérhe
 3. Add meg az Environment Variables értékeket:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `OPENAI_API_KEY` opcionálisan
 4. Futtasd a Supabase SQL fájlokat a Supabase SQL Editorban.
 5. Deploy után teszteld a belépést, dashboardot, munkákat, naptárat és egy kitelepülési lap nyomtatási nézetét.
 
 ## Ismert korlátok
 
-- Az AI asszisztens csak akkor ad generált választ, ha az `OPENAI_API_KEY` be van állítva.
 - A kitelepülési lap jelenleg böngészőből nyomtatható, nem külön PDF export.
 - Az ütközésfigyelés figyelmeztet, de nem blokkolja a mentést.
 - Nincs automatikus email küldés vagy naptárszinkron.

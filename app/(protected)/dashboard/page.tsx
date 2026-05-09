@@ -17,7 +17,6 @@ import {
 import { formatTime, getTodayIsoDate } from "@/lib/date";
 import { getJobStatusTone, jobStatusLabels, jobStatusOptions } from "@/lib/jobStatus";
 import { supabase } from "@/lib/supabaseClient";
-import { CrmAssistantPanel } from "@/components/ai/CrmAssistantPanel";
 import { buttonClasses } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -247,7 +246,6 @@ export default function DashboardPage() {
               "Ütközésfigyelés",
               "Kitelepülési lap",
               "Árajánlatok",
-              "AI asszisztens",
             ].map((feature) => (
               <div
                 className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700"
@@ -259,22 +257,6 @@ export default function DashboardPage() {
           </div>
         </CardContent>
       </Card>
-
-      <CrmAssistantPanel
-        context={{
-          activeEmployees: metrics.activeEmployees,
-          activeEquipment: metrics.activeEquipment,
-          todayJobs: metrics.todayJobs,
-          upcomingJobs: metrics.upcomingJobs.map((job) => ({
-            date: job.event_date,
-            status: job.status,
-            title: job.title,
-          })),
-          warnings: warningItems.map((warning) => warning.message),
-        }}
-        missingItems={warningItems.length > 0 ? ["ellenőrizendő ütközések"] : []}
-        mode="dashboard"
-      />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
         <Card>

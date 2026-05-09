@@ -12,7 +12,6 @@ import {
   JobEquipmentManager,
   JobEquipmentWithItem,
 } from "@/components/jobs/JobEquipmentManager";
-import { CrmAssistantPanel } from "@/components/ai/CrmAssistantPanel";
 import { buttonClasses, Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -226,20 +225,6 @@ export default function JobDetailsPage() {
     };
   }, [allAssignments, allJobEquipment, allJobs, employees, equipment, job]);
 
-  const missingItems = useMemo(() => {
-    if (!job) {
-      return [];
-    }
-
-    return [
-      !job.contact_phone ? "kapcsolattartó telefonszám" : null,
-      !job.start_time ? "kezdési idő" : null,
-      jobEquipment.length === 0 ? "hozzárendelt eszköz" : null,
-      assignments.length === 0 ? "beosztott dolgozó" : null,
-      !job.address ? "pontos cím" : null,
-    ].filter((item): item is string => Boolean(item));
-  }, [assignments.length, job, jobEquipment.length]);
-
   async function handleStatusChange(status: JobStatus) {
     if (!job) {
       return;
@@ -424,23 +409,6 @@ export default function JobDetailsPage() {
             jobEquipment={jobEquipment}
             jobId={job.id}
             onChanged={loadRelations}
-          />
-
-          <CrmAssistantPanel
-            context={{
-              assignments: assignments.map((assignment) => ({
-                employee: assignment.employee?.name,
-                role: assignment.assignment_role,
-              })),
-              equipment: jobEquipment.map((assignment) => ({
-                equipment: assignment.equipment?.name,
-                quantity: assignment.quantity,
-              })),
-              job,
-            }}
-            missingItems={missingItems}
-            mode="job"
-            title="AI összefoglaló"
           />
         </div>
 
