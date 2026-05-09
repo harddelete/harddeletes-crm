@@ -84,7 +84,7 @@ export function EmployeeForm({
   return (
     <Card>
       <CardContent>
-        <form className="grid gap-5" onSubmit={handleSubmit}>
+        <form className="grid w-full min-w-0 gap-5" onSubmit={handleSubmit}>
           {error ? <ErrorMessage message={error} /> : null}
 
           <div className="grid gap-4 md:grid-cols-2">

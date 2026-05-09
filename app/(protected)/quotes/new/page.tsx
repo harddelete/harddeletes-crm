@@ -69,7 +69,7 @@ export default function NewQuotePage() {
 
   if (clients.length === 0) {
     return (
-      <div className="grid gap-6">
+      <div className="mx-auto grid w-full max-w-5xl gap-6">
         <div>
           <h1 className="text-2xl font-semibold text-slate-950">Új árajánlat</h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -90,7 +90,7 @@ export default function NewQuotePage() {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="mx-auto grid w-full max-w-6xl gap-6">
       <div>
         <h1 className="text-2xl font-semibold text-slate-950">Új árajánlat</h1>
         <p className="mt-1 text-sm text-slate-500">

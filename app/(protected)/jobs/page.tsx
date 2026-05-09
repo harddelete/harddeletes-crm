@@ -192,7 +192,7 @@ export default function JobsPage() {
       ) : (
         <Card>
           <CardHeader>
-            <div className="grid gap-3 lg:grid-cols-[1fr_220px_180px]">
+            <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_220px_180px]">
               <div className="relative">
                 <Search
                   className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"

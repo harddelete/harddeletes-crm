@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export function Table({ children }: { children: ReactNode }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="w-full max-w-full overflow-x-auto">
       <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
         {children}
       </table>
@@ -37,7 +37,7 @@ export function Th({ children, className, ...props }: ThHTMLAttributes<HTMLTable
 
 export function Td({ children, className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td className={cn("px-4 py-3 text-slate-700", className)} {...props}>
+    <td className={cn("break-words px-4 py-3 text-slate-700", className)} {...props}>
       {children}
     </td>
   );

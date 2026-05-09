@@ -258,7 +258,7 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
           <CardHeader className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-slate-950">

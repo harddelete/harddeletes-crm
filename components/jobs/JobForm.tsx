@@ -111,7 +111,7 @@ export function JobForm({
   }
 
   return (
-    <form className="grid gap-5" onSubmit={handleSubmit}>
+    <form className="grid w-full min-w-0 gap-5" onSubmit={handleSubmit}>
       {error ? <ErrorMessage message={error} /> : null}
 
       <Card>
@@ -235,7 +235,7 @@ export function JobForm({
           </h2>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2">
             <Input
               label="Helyszíni kapcsolattartó"
               onChange={(event) => updateField("contact_name", event.target.value)}

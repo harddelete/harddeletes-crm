@@ -343,7 +343,7 @@ export default function JobDetailsPage() {
         </Card>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="grid gap-6">
           <Card>
             <CardHeader>

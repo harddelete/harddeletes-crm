@@ -20,6 +20,7 @@ Az app olyan céghez készült, amely különböző rendezvényekre visz ki lád
 - Naptár / ütemezés nézet időrendi munkalistával
 - Ütközésfigyelés dolgozókra és eszközökre
 - Nyomtatható kitelepülési lap minden munkához
+- Excel adatmentés több munkalapos `.xlsx` fájlba
 
 ## Használt technológiák
 
@@ -28,6 +29,7 @@ Az app olyan céghez készült, amely különböző rendezvényekre visz ki lád
 - Tailwind CSS
 - Supabase adatbázis és Auth
 - jsPDF árajánlat PDF exporthoz
+- exceljs Excel adatmentéshez
 - lucide-react ikonokhoz
 
 ## Telepítés
@@ -139,6 +141,16 @@ npm.cmd run build
 - `/clients`
 - `/quotes`
 - `/settings`
+
+## Excel adatmentés
+
+A Beállítások oldalon elérhető az `Excel mentés letöltése` gomb. Ez egy dátumozott, több munkalapos `.xlsx` fájlt készít:
+
+```text
+harddeletes-crm-backup-YYYY-MM-DD.xlsx
+```
+
+A mentés külön sheeteken tartalmazza az ügyfeleket, munkákat, dolgozókat, eszközöket, árajánlatokat, ajánlati tételeket, munka beosztásokat és munka eszközöket. Az export a bejelentkezett Supabase sessionnel fut, ezért a Row Level Security szabályok továbbra is érvényesek.
 
 ## Vercel deploy röviden
 

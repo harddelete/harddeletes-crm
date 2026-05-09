@@ -161,7 +161,7 @@ export function QuoteForm({
   }
 
   return (
-    <form className="grid gap-5" onSubmit={handleSubmit}>
+    <form className="grid w-full min-w-0 gap-5" onSubmit={handleSubmit}>
       {error ? <ErrorMessage message={error} /> : null}
 
       <Card>
@@ -239,7 +239,7 @@ export function QuoteForm({
         <CardContent className="grid gap-4">
           {itemsWithTotals.map((item, index) => (
             <div
-              className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 lg:grid-cols-[1.2fr_1.4fr_100px_90px_130px_120px_40px] lg:items-end"
+              className="grid min-w-0 gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 md:grid-cols-2 md:items-end"
               key={`${item.id ?? "new"}-${index}`}
             >
               <Input
@@ -299,7 +299,7 @@ export function QuoteForm({
         </CardContent>
       </Card>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
         <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <Link className={buttonClasses({ variant: "outline" })} href={cancelHref}>
             Mégsem

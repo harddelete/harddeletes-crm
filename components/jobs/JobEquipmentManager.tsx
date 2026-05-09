@@ -117,7 +117,7 @@ export function JobEquipmentManager({
         {error ? <ErrorMessage message={error} /> : null}
 
         <form
-          className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 lg:grid-cols-[1fr_120px_1fr_auto] lg:items-end"
+          className="grid min-w-0 gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 md:grid-cols-2 md:items-end"
           onSubmit={handleSubmit}
         >
           <Select

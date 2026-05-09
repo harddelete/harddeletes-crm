@@ -71,7 +71,7 @@ export function SettingsForm({
   return (
     <Card>
       <CardContent>
-        <form className="grid gap-5" onSubmit={handleSubmit}>
+        <form className="grid w-full min-w-0 gap-5" onSubmit={handleSubmit}>
           {error ? <ErrorMessage message={error} /> : null}
           {success ? (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
