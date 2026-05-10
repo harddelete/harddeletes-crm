@@ -6,8 +6,6 @@ import {
   emptyProfileForm,
   SettingsForm,
 } from "@/components/settings/SettingsForm";
-import { ExcelBackupButton } from "@/components/settings/ExcelBackupButton";
-import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { supabase } from "@/lib/supabaseClient";
@@ -116,18 +114,6 @@ export default function SettingsPage() {
 
       {error ? <ErrorMessage message={error} /> : null}
       <SettingsForm initialValues={initialValues} onSubmit={handleSubmit} />
-      <Card>
-        <CardHeader>
-          <h2 className="text-base font-semibold text-slate-950">Adatmentés</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Töltsd le a CRM adataidat egy rendezett Excel fájlba biztonsági
-            mentésként.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <ExcelBackupButton />
-        </CardContent>
-      </Card>
     </div>
   );
 }
