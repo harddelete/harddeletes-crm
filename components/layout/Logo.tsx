@@ -8,7 +8,7 @@ type LogoProps = {
 };
 
 const sizeClasses = {
-  compact: "w-14 max-w-[32vw] sm:w-16",
+  compact: "w-10 max-w-[22vw] sm:w-12",
   default: "w-40 max-w-full",
   large: "w-56 max-w-[72vw] sm:w-64",
 };
@@ -28,7 +28,7 @@ export function Logo({ className, preload, size = "default" }: LogoProps) {
           size === "large"
             ? "(max-width: 640px) 224px, 256px"
             : size === "compact"
-              ? "(max-width: 640px) 56px, 64px"
+              ? "(max-width: 640px) 40px, 48px"
               : "160px"
         }
         src="/logo.png"
